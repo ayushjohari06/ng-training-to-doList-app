@@ -1,0 +1,12 @@
+CREATE DATABASE your_database;
+
+USE your_database;
+
+CREATE TABLE tasks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    assignedTo VARCHAR(255),
+    status VARCHAR(50),
+    dueDate DATE,
+    priority VARCHAR(50),
+    comments TEXT
+);

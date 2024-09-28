@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
 import TaskForm from './TaskForm';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
@@ -7,10 +10,27 @@ const TaskList = () => {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
+  useEffect(() => {
+    axios.get('http://localhost:5000/tasks')
+      .then(response => {
+        setTasks(response.data);
+      })
+      .catch(error => {
+        console.error('There was an error fetching the tasks!', error);
+      });
+  }, []);
+
   const handleNewTask = () => {
     setSelectedTask(null);
     setShowForm(true);
   };
+  
+  
+  
+
+
+
+
 
   const handleEditTask = (task) => {
     setSelectedTask(task);
@@ -19,14 +39,20 @@ const TaskList = () => {
 
   const handleSaveTask = (task) => {
     if (selectedTask) {
-      setTasks(tasks.map(t => (t.id === selectedTask.id ? { ...task, id: selectedTask.id } : t)));
+      axios.put(`http://localhost:5000/tasks/${selectedTask.id}`, task)
+        .then(response => {
+          setTasks(tasks.map(t => (t.id === selectedTask.id ? response.data : t)));
+          setShowForm(false);
+        });
     } else {
-      // Generate a random color for the border
-      const borderColor = `hsl(${Math.random() * 360}, 70%, 50%)`;
-      setTasks([...tasks, { ...task, id: tasks.length + 1, borderColor }]);
+      axios.post('http://localhost:5000/tasks', task)
+        .then(response => {
+          setTasks([...tasks, response.data]);
+          setShowForm(false);
+        });
     }
-    setShowForm(false);
   };
+  
 
   const handleDeleteTask = (taskId) => {
     setTasks(tasks.filter(t => t.id !== taskId));
